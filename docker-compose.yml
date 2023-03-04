@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      args:
+        user: app-user
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: app
+    container_name: app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./app:/var/www
+    networks:
+      - app
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: app-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./app:/var/www
+      - ./docker-config/nginx:/etc/nginx/conf.d
+    networks:
+      - app
+  db:
+    image: 'mariadb:10'
+    container_name: app-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: app
+    volumes:
+      - mariadb-app:/var/lib/mysql
+    networks:
+      - app
+  npm:
+    image: node:current-alpine
+    container_name: npm
+    volumes:
+      - ./app:/var/www/html
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    working_dir: /var/www/html
+    entrypoint: [ 'npm' ]
+    networks:
+      - app
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  mariadb-app:
