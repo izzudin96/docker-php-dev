@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
-      - ./app:/var/www
+      - ./apps:/var/www
     networks:
       - app
   nginx:
@@ -23,7 +23,7 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./app:/var/www
+      - ./apps:/var/www
       - ./docker-config/nginx:/etc/nginx/conf.d
     networks:
       - app
@@ -44,12 +44,12 @@ services:
     image: node:current-alpine
     container_name: npm
     volumes:
-      - ./app:/var/www/html
+      - ./apps:/var/www/html
     ports:
       - "3000:3000"
       - "3001:3001"
     working_dir: /var/www/html
-    entrypoint: [ 'npm' ]
+    entrypoint: [ '/bin/sh' ]
     networks:
       - app
 networks:
