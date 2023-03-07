@@ -6,14 +6,14 @@ services:
       args:
         user: app-user
         uid: 1000
-      context: ./
+      context: ./php
       dockerfile: Dockerfile
     image: app
     container_name: app
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
-      - ./apps:/var/www
+      - ../apps:/var/www
     networks:
       - app
   nginx:
@@ -23,8 +23,8 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./apps:/var/www
-      - ./docker-config/nginx:/etc/nginx/conf.d
+      - ../apps:/var/www
+      - ./nginx:/etc/nginx/conf.d
     networks:
       - app
   db:
@@ -37,14 +37,14 @@ services:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: app
     volumes:
-      - mariadb-app:/var/lib/mysql
+      - ./db:/var/lib/mysql
     networks:
       - app
   npm:
     image: node:current-alpine
     container_name: npm
     volumes:
-      - ./apps:/var/www/html
+      - ../apps:/var/www/html
     ports:
       - "3000:3000"
       - "3001:3001"
